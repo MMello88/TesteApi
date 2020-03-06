@@ -9,13 +9,13 @@ class User_Api extends API_Controller
     }
 
     /**
-     * demo method 
+     * limit method 
      *
-     * @link [api/user/demo]
+     * @link [api/user/limit]
      * @method POST
      * @return Response|void
      */
-    public function demo()
+    public function limit()
     {
         header("Access-Control-Allow-Origin: *");
 
@@ -29,13 +29,13 @@ class User_Api extends API_Controller
             /**
              * Number limit, type limit, time limit (last minute)
              */
-            'limit' => [5, 'ip', 'everyday'],
+            'limit' => [5, 'ip', 5],
 
             /**
              * type :: ['header', 'get', 'post']
              * key  :: ['table : Check Key in Database', 'key']
              */
-            'key' => ['POST', $this->key() ], // type, {key}|table (by default)
+            //'key' => ['POST', $this->key() ], // type, {key}|table (by default)
         ]);
         
         // return data
