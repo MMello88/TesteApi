@@ -21,21 +21,8 @@ class User_Api extends API_Controller
 
         // API Configuration
         $this->_apiConfig([
-            /**
-             * By Default Request Method `GET`
-             */
             'methods' => ['POST'], // 'GET', 'OPTIONS'
-
-            /**
-             * Number limit, type limit, time limit (last minute)
-             */
             'limit' => [5, 'ip', 5],
-
-            /**
-             * type :: ['header', 'get', 'post']
-             * key  :: ['table : Check Key in Database', 'key']
-             */
-            //'key' => ['POST', $this->key() ], // type, {key}|table (by default)
         ]);
         
         // return data
@@ -77,27 +64,54 @@ class User_Api extends API_Controller
         ]);
 
         // you user authentication code will go here, you can compare the user with the database or whatever
-        $payload = [
-            'id' => "Your User's ID",
-            'other' => "Some other data"
-        ];
 
-        // Load Authorization Library or Load in autoload config file
-        $this->load->library('authorization_token');
+        $data = $this->verify_login();
+        if($data === True){
+            $payload = [
+                'id' => "Your User's ID",
+                'other' => "Some other data",
+                'email' => $_POST['email'],
+                'senha' => $_POST['senha']
+            ];    
+        
 
-        // generate a token
-        $token = $this->authorization_token->generateToken($payload);
+        
 
-        // return data
-        $this->api_return(
-            [
-                'status' => true,
-                "result" => [
-                    'token' => $token,
+            // Load Authorization Library or Load in autoload config file
+            $this->load->library('authorization_token');
+
+            // generate a token
+            $token = $this->authorization_token->generateToken($payload);
+
+            // return data
+            $this->api_return(
+                [
+                    'status' => true,
+                    "result" => [
+                        'token' => $token,
+                    ],
+                    
                 ],
-                
-            ],
-        200);
+            200);
+        } else {
+                    // API Configuration
+            $this->_apiConfig([
+                /**
+                 * By Default Request Method `GET`
+                 */
+                'methods' => ['POST'], // 'GET', 'OPTIONS'
+
+                /**
+                 * Number limit, type limit, time limit (last minute)
+                 */
+                'limit' => [5, 'ip', 5],
+            ]);
+        
+            $this->api_return(
+                $data,
+                401
+            );
+        }
     }
 
     /**
@@ -126,5 +140,25 @@ class User_Api extends API_Controller
                 ],
             ],
         200);
+    }
+
+    private function verify_login(){
+        $data = [];
+        if ($_POST['email'] == 'matheusnarciso@hotmail.com'){
+            if(md5($_POST['senha']) == md5('12345')){
+                return true;
+            } else {
+                $data = [
+                    'status' => false,
+                    'result' => ['message' => 'Password does not match.']
+                ];
+            }
+        } else {
+            $data = [
+                    'status' => false,
+                    'result' => ['message' => 'E-mail not found.']
+                ];
+        }
+        return $data;
     }
 }
